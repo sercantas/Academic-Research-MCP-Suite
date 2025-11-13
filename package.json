@@ -1,0 +1,74 @@
+{
+  "name": "academic-research-mcp-suite",
+  "version": "1.0.0",
+  "description": "A comprehensive Model Context Protocol (MCP) server suite for academic research workflow automation. Includes 6 specialized servers for complete research pipeline from question refinement to report generation.",
+  "main": "dist/research_orchestrator.js",
+  "bin": {
+    "academic-research-orchestrator": "./dist/research_orchestrator.js",
+    "academic-research-initiator": "./dist/research_initiator_developer_server.js",
+    "academic-data-processor": "./dist/data_wrangler.js",
+    "academic-code-generator": "./dist/code_generator_v2.js",
+    "academic-code-executor": "./dist/code_executor.js",
+    "academic-research-writer": "./dist/research_writer.js"
+  },
+  "scripts": {
+    "build": "npm run compile",
+    "compile": "./scripts/compile.sh",
+    "test": "node scripts/test.js",
+    "setup": "node scripts/setup-mcp.js",
+    "demo": "node scripts/demo.js",
+    "prepublishOnly": "npm run build && npm run test"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "config/",
+    "docs/",
+    "scripts/",
+    "README.md",
+    "tsconfig.json"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "academic",
+    "research",
+    "automation",
+    "workflow",
+    "data-analysis",
+    "statistics",
+    "research-tools",
+    "claude",
+    "amazon-q",
+    "typescript",
+    "nodejs"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/academic-research-mcp-suite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/academic-research-mcp-suite/issues"
+  },
+  "homepage": "https://github.com/yourusername/academic-research-mcp-suite#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "zod": "^3.25.75",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.2.2"
+  },
+  "peerDependencies": {
+    "node": ">=18.0.0"
+  }
+}

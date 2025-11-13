@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "academic-research-orchestrator": {
+      "command": "npx",
+      "args": ["-y", "academic-research-mcp-suite", "academic-research-orchestrator"]
+    },
+    "academic-research-initiator": {
+      "command": "npx", 
+      "args": ["-y", "academic-research-mcp-suite", "academic-research-initiator"]
+    },
+    "academic-data-processor": {
+      "command": "npx",
+      "args": ["-y", "academic-research-mcp-suite", "academic-data-processor"]
+    },
+    "academic-code-generator": {
+      "command": "npx",
+      "args": ["-y", "academic-research-mcp-suite", "academic-code-generator"]
+    },
+    "academic-code-executor": {
+      "command": "npx",
+      "args": ["-y", "academic-research-mcp-suite", "academic-code-executor"]
+    },
+    "academic-research-writer": {
+      "command": "npx",
+      "args": ["-y", "academic-research-mcp-suite", "academic-research-writer"]
+    }
+  }
+}
