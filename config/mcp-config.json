@@ -1,50 +1,22 @@
 {
   "mcpServers": {
     "academic-research-orchestrator": {
-      "command": "node",
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/research_orchestrator.js"],
-      "env": {
-        "RESEARCH_DATA_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/processed_data",
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+      "command": "academic-research-orchestrator"
     },
-    "academic-research-initiator-developer": {
-      "command": "node",
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/research_initiator_developer_server.js"],
-      "env": {
-        "RESEARCH_DATA_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/processed_data",
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+    "academic-research-initiator": {
+      "command": "academic-research-initiator"
     },
-    "academic-data-processor-wrangler": {
-      "command": "node",
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/data_wrangler.js"],
-      "env": {
-        "RESEARCH_DATA_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/processed_data",
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+    "academic-data-processor": {
+      "command": "academic-data-processor"
     },
     "academic-code-generator": {
-      "command": "node", 
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/code_generator_v2.js"],
-      "env": {
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+      "command": "academic-code-generator"
     },
     "academic-code-executor": {
-      "command": "node",
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/code_executor.js"],
-      "env": {
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+      "command": "academic-code-executor"
     },
     "academic-research-writer": {
-      "command": "node",
-      "args": ["/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/dist/research_writer.js"],
-      "env": {
-        "REPORTS_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/reports",
-        "OUTPUT_PATH": "/Users/st/Documents/mcp-research-flow-feat-finalize-academic-mcp-suite/clean-project/output"
-      }
+      "command": "academic-research-writer"
     }
   }
 }

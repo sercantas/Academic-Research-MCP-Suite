@@ -21,47 +21,64 @@ The Academic Research MCP Suite provides **6 specialized AI servers** that work 
 ### Installation
 
 ```bash
-# Install globally
+# Option 1: Global installation (recommended)
 npm install -g academic-research-mcp-suite
 
-# Or use directly with npx (no installation needed)
-npx academic-research-mcp-suite
+# Option 2: Use directly with npx (no installation needed)
+npx -y academic-research-orchestrator
+npx -y academic-data-processor
+# Each server can be run independently
 ```
 
 ### Usage with Claude Desktop
 
-Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+**Step 1: Install globally**
+```bash
+npm install -g academic-research-mcp-suite
+```
+
+**Step 2: Add to Claude Desktop configuration**
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "academic-research-orchestrator": {
-      "command": "npx",
-      "args": ["-y", "academic-research-mcp-suite", "academic-research-orchestrator"]
+      "command": "academic-research-orchestrator"
     },
     "academic-research-initiator": {
-      "command": "npx", 
-      "args": ["-y", "academic-research-mcp-suite", "academic-research-initiator"]
+      "command": "academic-research-initiator"
     },
     "academic-data-processor": {
-      "command": "npx",
-      "args": ["-y", "academic-research-mcp-suite", "academic-data-processor"]
+      "command": "academic-data-processor"
     },
     "academic-code-generator": {
-      "command": "npx",
-      "args": ["-y", "academic-research-mcp-suite", "academic-code-generator"]
+      "command": "academic-code-generator"
     },
     "academic-code-executor": {
-      "command": "npx",
-      "args": ["-y", "academic-research-mcp-suite", "academic-code-executor"]
+      "command": "academic-code-executor"
     },
     "academic-research-writer": {
-      "command": "npx",
-      "args": ["-y", "academic-research-mcp-suite", "academic-research-writer"]
+      "command": "academic-research-writer"
     }
   }
 }
 ```
+
+**Alternative: Use with npx (no global install needed)**
+```json
+{
+  "mcpServers": {
+    "academic-data-processor": {
+      "command": "npx",
+      "args": ["-y", "academic-data-processor"]
+    }
+  }
+}
+```
+
+**Note:** Each server runs independently. You can configure just the ones you need.
 
 ### Usage with Amazon Q CLI
 
