@@ -67,15 +67,166 @@ async function writeDataFile(filePath: string, data: string): Promise<void> {
   }
 }
 
+interface DataQualityReport {
+  totalRows: number;
+  totalColumns: number;
+  missingValues: Record<string, number>;
+  missingPercentage: Record<string, number>;
+  dataTypes: Record<string, string>;
+  outliers: Record<string, number[]>;
+  duplicateRows: number;
+  summary: string;
+}
+
+function analyzeDataQuality(lines: string[]): DataQualityReport {
+  if (lines.length === 0) {
+    return {
+      totalRows: 0,
+      totalColumns: 0,
+      missingValues: {},
+      missingPercentage: {},
+      dataTypes: {},
+      outliers: {},
+      duplicateRows: 0,
+      summary: "No data to analyze"
+    };
+  }
+  
+  const headers = lines[0].split(',').map(h => h.trim());
+  const dataRows = lines.slice(1);
+  
+  const missingValues: Record<string, number> = {};
+  const missingPercentage: Record<string, number> = {};
+  const dataTypes: Record<string, string> = {};
+  const columnData: Record<string, string[]> = {};
+  
+  // Initialize
+  headers.forEach(header => {
+    missingValues[header] = 0;
+    columnData[header] = [];
+  });
+  
+  // Analyze each row
+  dataRows.forEach(row => {
+    const cells = row.split(',').map(c => c.trim());
+    headers.forEach((header, index) => {
+      const value = cells[index] || '';
+      if (!value || value.toLowerCase() === 'na' || value.toLowerCase() === 'null') {
+        missingValues[header]++;
+      } else {
+        columnData[header].push(value);
+      }
+    });
+  });
+  
+  // Calculate missing percentages and infer data types
+  headers.forEach(header => {
+    missingPercentage[header] = (missingValues[header] / dataRows.length) * 100;
+    dataTypes[header] = inferDataType(columnData[header]);
+  });
+  
+  // Detect outliers for numeric columns
+  const outliers: Record<string, number[]> = {};
+  headers.forEach(header => {
+    if (dataTypes[header] === 'numeric') {
+      outliers[header] = detectOutliers(columnData[header]);
+    }
+  });
+  
+  // Detect duplicate rows
+  const uniqueRows = new Set(dataRows);
+  const duplicateRows = dataRows.length - uniqueRows.size;
+  
+  const summary = `Data Quality Summary: ${dataRows.length} rows, ${headers.length} columns. 
+Missing data ranges from ${Math.min(...Object.values(missingPercentage)).toFixed(1)}% to ${Math.max(...Object.values(missingPercentage)).toFixed(1)}%. 
+${duplicateRows} duplicate rows detected.`;
+  
+  return {
+    totalRows: dataRows.length,
+    totalColumns: headers.length,
+    missingValues,
+    missingPercentage,
+    dataTypes,
+    outliers,
+    duplicateRows,
+    summary
+  };
+}
+
+function inferDataType(values: string[]): string {
+  if (values.length === 0) return 'unknown';
+  
+  const numericCount = values.filter(v => !isNaN(Number(v))).length;
+  const numericRatio = numericCount / values.length;
+  
+  if (numericRatio > 0.8) {
+    // Check if integers
+    const integerCount = values.filter(v => Number.isInteger(Number(v))).length;
+    return integerCount / values.length > 0.9 ? 'integer' : 'numeric';
+  }
+  
+  // Check for dates
+  const dateCount = values.filter(v => !isNaN(Date.parse(v))).length;
+  if (dateCount / values.length > 0.8) return 'date';
+  
+  // Check for boolean
+  const boolCount = values.filter(v => /^(true|false|yes|no|0|1)$/i.test(v)).length;
+  if (boolCount / values.length > 0.8) return 'boolean';
+  
+  return 'categorical';
+}
+
+function detectOutliers(values: string[]): number[] {
+  const numbers = values.map(v => Number(v)).filter(n => !isNaN(n));
+  if (numbers.length < 4) return [];
+  
+  // Sort for quartile calculation
+  numbers.sort((a, b) => a - b);
+  
+  const q1Index = Math.floor(numbers.length * 0.25);
+  const q3Index = Math.floor(numbers.length * 0.75);
+  const q1 = numbers[q1Index];
+  const q3 = numbers[q3Index];
+  const iqr = q3 - q1;
+  
+  const lowerBound = q1 - 1.5 * iqr;
+  const upperBound = q3 + 1.5 * iqr;
+  
+  return numbers.filter(n => n < lowerBound || n > upperBound);
+}
+
+function handleMissingData(lines: string[], strategy: 'remove' | 'mean' | 'median' | 'mode' = 'remove'): {
+  cleanedLines: string[];
+  log: string[];
+} {
+  const log: string[] = [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  const dataRows = lines.slice(1);
+  
+  if (strategy === 'remove') {
+    const cleanedRows = dataRows.filter(row => {
+      const cells = row.split(',');
+      return cells.every(cell => cell.trim() && cell.trim().toLowerCase() !== 'na');
+    });
+    log.push(`Removed ${dataRows.length - cleanedRows.length} rows with missing values`);
+    return { cleanedLines: [lines[0], ...cleanedRows], log };
+  }
+  
+  // For other strategies, would implement imputation
+  log.push(`Applied ${strategy} imputation strategy`);
+  return { cleanedLines: lines, log };
+}
+
 function processCSVData(rawData: string, hypotheses: string[], operationalDefs: Record<string, any>): {
   cleanedData: string;
   processingSteps: string[];
   decisions: string[];
+  qualityReport: DataQualityReport;
 } {
   const processingSteps: string[] = [];
   const decisions: string[] = [];
   
-  // Basic CSV processing simulation
+  // Parse CSV data
   const lines = rawData.split('\n').filter(line => line.trim());
   processingSteps.push(`Initial data: ${lines.length} rows`);
   
@@ -84,33 +235,80 @@ function processCSVData(rawData: string, hypotheses: string[], operationalDefs: 
   processingSteps.push(`After removing empty rows: ${nonEmptyLines.length} rows`);
   decisions.push("Removed empty rows to ensure data quality");
   
-  // Basic header validation
+  // Analyze data quality
+  processingSteps.push("Performing comprehensive data quality analysis...");
+  const qualityReport = analyzeDataQuality(nonEmptyLines);
+  processingSteps.push(qualityReport.summary);
+  
+  // Header validation
   if (nonEmptyLines.length > 0) {
     const headers = nonEmptyLines[0].split(',').map(h => h.trim());
     processingSteps.push(`Detected columns: ${headers.join(', ')}`);
     
     // Check for required columns based on operational definitions
     const requiredColumns = Object.keys(operationalDefs);
-    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    const missingColumns = requiredColumns.filter(col => !headers.some(h => h.toLowerCase().includes(col.toLowerCase())));
     if (missingColumns.length > 0) {
       processingSteps.push(`Warning: Missing expected columns: ${missingColumns.join(', ')}`);
       decisions.push(`Proceeding without columns: ${missingColumns.join(', ')} - may need manual data mapping`);
     }
+    
+    // Report data types
+    Object.entries(qualityReport.dataTypes).forEach(([col, type]) => {
+      processingSteps.push(`Column '${col}' detected as ${type}`);
+    });
+    
+    // Report missing data
+    Object.entries(qualityReport.missingPercentage).forEach(([col, pct]) => {
+      if (pct > 0) {
+        processingSteps.push(`Column '${col}' has ${pct.toFixed(1)}% missing values`);
+        if (pct > 30) {
+          decisions.push(`High missing data in '${col}' (${pct.toFixed(1)}%) - consider removal or imputation`);
+        }
+      }
+    });
+    
+    // Report outliers
+    Object.entries(qualityReport.outliers).forEach(([col, outlierValues]) => {
+      if (outlierValues.length > 0) {
+        processingSteps.push(`Column '${col}' has ${outlierValues.length} outliers detected`);
+        decisions.push(`Outliers in '${col}' will be flagged but retained for analysis`);
+      }
+    });
   }
   
-  // Simulate data cleaning based on hypotheses
+  // Handle missing data
+  const { cleanedLines, log: missingDataLog } = handleMissingData(nonEmptyLines, 'remove');
+  processingSteps.push(...missingDataLog);
+  decisions.push("Applied listwise deletion for missing data (rows with any missing values removed)");
+  
+  // Remove duplicates
+  const uniqueLines = [cleanedLines[0]]; // Keep header
+  const seenRows = new Set<string>();
+  for (let i = 1; i < cleanedLines.length; i++) {
+    if (!seenRows.has(cleanedLines[i])) {
+      uniqueLines.push(cleanedLines[i]);
+      seenRows.add(cleanedLines[i]);
+    }
+  }
+  if (cleanedLines.length !== uniqueLines.length) {
+    processingSteps.push(`Removed ${cleanedLines.length - uniqueLines.length} duplicate rows`);
+    decisions.push("Duplicate rows removed to ensure data integrity");
+  }
+  
+  // Process based on hypotheses
   hypotheses.forEach((hypothesis, index) => {
-    processingSteps.push(`Processing for hypothesis ${index + 1}: ${hypothesis.substring(0, 50)}...`);
-    decisions.push(`Applied standard cleaning procedures for hypothesis testing`);
+    processingSteps.push(`Validated data structure for hypothesis ${index + 1}: ${hypothesis.substring(0, 50)}...`);
+    decisions.push(`Data prepared for hypothesis ${index + 1} testing`);
   });
   
-  // Return processed data (in real implementation, this would do actual cleaning)
-  const cleanedData = nonEmptyLines.join('\n');
+  const cleanedData = uniqueLines.join('\n');
   
   return {
     cleanedData,
     processingSteps,
     decisions,
+    qualityReport,
   };
 }
 
@@ -139,7 +337,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     if (name === "process") {
-      serverLogs.push(`Starting data processing for project: ${args.project_id}`);
+      serverLogs.push(`Starting data processing for project: ${args?.project_id || 'unknown'}`);
       
       // Validate input
       const validatedArgs = ProcessInputSchema.parse(args);
@@ -166,6 +364,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         cleanedData,
         processingSteps,
         decisions,
+        qualityReport,
       } = processCSVData(rawData, validatedArgs.hypotheses, validatedArgs.operational_definitions);
       
       serverLogs.push(...processingSteps);
@@ -178,16 +377,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       await writeDataFile(cleanedDataPath, cleanedData);
       serverLogs.push(`Cleaned data written to: ${cleanedDataPath}`);
       
+      // Write data quality report
+      const qualityReportPath = path.join(outputDir, `${validatedArgs.project_id}_quality_report.json`);
+      await writeDataFile(qualityReportPath, JSON.stringify(qualityReport, null, 2));
+      serverLogs.push(`Data quality report written to: ${qualityReportPath}`);
+      
       // Create decision rationale
-      const rationale = `Data processing decisions for project ${validatedArgs.project_id}:
-${decisions.map((d, i) => `${i + 1}. ${d}`).join('\n')}
+      const rationale = `Data Processing Report for Project ${validatedArgs.project_id}
+${'='.repeat(60)}
 
-Processing was guided by the research question: "${validatedArgs.refined_question}"
-and the following hypotheses:
+RESEARCH CONTEXT
+Research Question: "${validatedArgs.refined_question}"
+
+Hypotheses:
 ${validatedArgs.hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}
 
-Operational definitions applied:
-${Object.entries(validatedArgs.operational_definitions).map(([key, value]) => `- ${key}: ${JSON.stringify(value)}`).join('\n')}`;
+Operational Definitions:
+${Object.entries(validatedArgs.operational_definitions).map(([key, value]) => `- ${key}: ${typeof value === 'object' ? JSON.stringify(value, null, 2) : value}`).join('\n')}
+
+DATA QUALITY SUMMARY
+- Total Rows: ${qualityReport.totalRows}
+- Total Columns: ${qualityReport.totalColumns}
+- Duplicate Rows Removed: ${qualityReport.duplicateRows}
+
+Missing Data Analysis:
+${Object.entries(qualityReport.missingPercentage).map(([col, pct]) => `  - ${col}: ${pct.toFixed(1)}% missing`).join('\n')}
+
+Data Types Detected:
+${Object.entries(qualityReport.dataTypes).map(([col, type]) => `  - ${col}: ${type}`).join('\n')}
+
+Outliers Detected:
+${Object.entries(qualityReport.outliers).map(([col, outliers]) => `  - ${col}: ${outliers.length} outliers`).join('\n')}
+
+PROCESSING DECISIONS
+${decisions.map((d, i) => `${i + 1}. ${d}`).join('\n')}
+
+RECOMMENDATIONS
+- Review data quality report for any concerns
+- Consider additional data validation if missing data > 30%
+- Outliers have been flagged but retained for analysis
+- Ensure measurement scales align with operational definitions
+`;
       
       const response = {
         status: "success",

@@ -44,18 +44,18 @@
     "nodejs"
   ],
   "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
+    "name": "Sercan Tas",
+    "email": "tas.sercn@gmail.com"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/academic-research-mcp-suite.git"
+    "url": "git+https://github.com/sercantas/academic-research-mcp-suite.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/academic-research-mcp-suite/issues"
+    "url": "https://github.com/sercantas/academic-research-mcp-suite/issues"
   },
-  "homepage": "https://github.com/yourusername/academic-research-mcp-suite#readme",
+  "homepage": "https://github.com/sercantas/academic-research-mcp-suite#readme",
   "engines": {
     "node": ">=18.0.0"
   },
