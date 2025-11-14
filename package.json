@@ -1,6 +1,6 @@
 {
   "name": "academic-research-mcp-suite",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A comprehensive Model Context Protocol (MCP) server suite for academic research workflow automation. Includes 6 specialized servers for complete research pipeline from question refinement to report generation.",
   "main": "dist/research_orchestrator.js",
   "bin": {
