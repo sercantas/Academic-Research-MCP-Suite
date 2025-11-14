@@ -45,3 +45,7 @@ fi
 echo ""
 echo "📁 Compiled files in ./dist/:"
 ls -la ./dist/*.js 2>/dev/null | head -10
+
+echo ""
+echo "🔧 Adding shebangs to compiled files..."
+./scripts/add-shebangs.sh
