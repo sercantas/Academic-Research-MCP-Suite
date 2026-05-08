@@ -9,13 +9,17 @@
     "academic-data-processor": "dist/data_wrangler.js",
     "academic-code-generator": "dist/code_generator_v2.js",
     "academic-code-executor": "dist/code_executor.js",
-    "academic-research-writer": "dist/research_writer.js"
+    "academic-research-writer": "dist/research_writer.js",
+    "academic-mcp-doctor": "scripts/mcp-doctor.js",
+    "academic-mcp-configure": "scripts/configure-all-mcp.js"
   },
   "scripts": {
     "build": "npm run compile",
     "compile": "./scripts/compile.sh",
     "test": "node scripts/test.js",
     "setup": "node scripts/setup-mcp.js",
+    "configure": "node scripts/configure-all-mcp.js",
+    "doctor": "node scripts/mcp-doctor.js",
     "demo": "node scripts/demo.js",
     "prepublishOnly": "npm run build && npm run test"
   },
