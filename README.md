@@ -3,250 +3,142 @@
 [![npm version](https://badge.fury.io/js/academic-research-mcp-suite.svg)](https://badge.fury.io/js/academic-research-mcp-suite)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A comprehensive **Model Context Protocol (MCP)** server suite for academic research workflow automation. Transform your research process from initial questions to publication-ready reports with AI-powered automation.
-
-## 🎯 What is This?
-
-The Academic Research MCP Suite provides **6 specialized AI servers** that work together to automate your entire research workflow:
-
-- 🧠 **Question Refinement** → Transform vague ideas into testable hypotheses
-- 🗃️ **Data Processing** → Clean and prepare datasets intelligently  
-- 💻 **Code Generation** → Create statistical analysis scripts automatically
-- ⚡ **Script Execution** → Run analyses in Python, R, or Node.js
-- 📊 **Report Writing** → Generate publication-ready research documents
-- 🎯 **Workflow Orchestration** → Coordinate the entire research pipeline
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-# Option 1: Global installation (recommended)
-npm install -g academic-research-mcp-suite
-
-# Option 2: Use directly with npx (no installation needed)
-npx -y academic-research-orchestrator
-npx -y academic-data-processor
-# Each server can be run independently
-```
-
-### Usage with Claude Desktop
-
-**Step 1: Install globally**
-```bash
-npm install -g academic-research-mcp-suite
-```
-
-**Step 2: Add to Claude Desktop configuration**
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "academic-research-orchestrator": {
-      "command": "academic-research-orchestrator"
-    },
-    "academic-research-initiator": {
-      "command": "academic-research-initiator"
-    },
-    "academic-data-processor": {
-      "command": "academic-data-processor"
-    },
-    "academic-code-generator": {
-      "command": "academic-code-generator"
-    },
-    "academic-code-executor": {
-      "command": "academic-code-executor"
-    },
-    "academic-research-writer": {
-      "command": "academic-research-writer"
-    }
-  }
-}
-```
-
-**Alternative: Use with npx (no global install needed)**
-```json
-{
-  "mcpServers": {
-    "academic-data-processor": {
-      "command": "npx",
-      "args": ["-y", "academic-data-processor"]
-    }
-  }
-}
-```
-
-**Note:** Each server runs independently. You can configure just the ones you need.
-
-### Usage with Amazon Q CLI
-
-```bash
-# Configure with Q CLI
-q mcp add academic-research-orchestrator npx academic-research-mcp-suite academic-research-orchestrator
-# ... repeat for other servers
-```
-
-## 🔬 The 6 Research Servers
-
-### 1. 🎯 Research Orchestrator
-**Coordinates complete research workflows**
-- Manages the entire research pipeline
-- Calls other servers automatically
-- Tracks project progress and state
-
-**Usage**: *"Use the research orchestrator to start a new research project on remote work productivity"*
-
-### 2. 🧠 Research Initiator Developer  
-**Refines research questions and develops hypotheses**
-- Transforms vague research ideas into structured questions
-- Develops testable hypotheses
-- Creates operational definitions
-
-**Usage**: *"Help me refine my research question about social media and mental health"*
-
-### 3. 🗃️ Data Processor Wrangler
-**Processes and cleans research data**
-- Intelligent data cleaning and preparation
-- Documents all processing decisions
-- Handles multiple data formats
-
-**Usage**: *"Process my survey data for analysis"*
-
-### 4. 💻 Code Generator
-**Generates statistical analysis scripts**
-- Creates Python, R, and JavaScript code
-- Implements appropriate statistical methods
-- Provides exploratory data analysis
-
-**Usage**: *"Generate Python code for correlation analysis between productivity and satisfaction"*
-
-### 5. ⚡ Code Executor
-**Executes analysis scripts safely**
-- Runs Python, R, and Node.js scripts
-- Captures outputs and logs
-- Manages execution environments
-
-**Usage**: *"Execute my statistical analysis scripts"*
-
-### 6. 📊 Research Writer
-**Composes comprehensive research reports**
-- Generates publication-ready documents
-- Synthesizes all research components
-- Creates structured academic reports
-
-**Usage**: *"Write a comprehensive research report from my analysis results"*
-
-## 🔄 Complete Research Workflow
-
-```mermaid
-graph LR
-    A[Research Idea] --> B[Question Refinement]
-    B --> C[Data Processing]
-    C --> D[Code Generation]
-    D --> E[Script Execution]
-    E --> F[Report Writing]
-    F --> G[Publication-Ready Report]
-```
-
-**One Command Does It All:**
-```
-"Use the research orchestrator to conduct a complete study on [your topic] with data at [path]"
-```
-
-## 💡 Usage Examples
-
-### Complete Workflow
-```
-"Use the research orchestrator to start a research project investigating the impact of remote work on employee productivity and job satisfaction, using my survey data at ./data/employee_survey.csv"
-```
-
-### Individual Tools
-```
-"Refine my research question: Does social media usage affect academic performance?"
-
-"Process my dataset and prepare it for statistical analysis"
-
-"Generate Python code for regression analysis with productivity as dependent variable"
-
-"Execute my analysis scripts and capture the results"
-
-"Write a comprehensive research report including methodology, results, and conclusions"
-```
-
-## 🛠️ Features
-
-- ✅ **Complete Research Automation** - From question to publication
-- ✅ **Multi-Language Support** - Python, R, Node.js code generation
-- ✅ **Intelligent Data Processing** - Smart cleaning with decision logging
-- ✅ **Statistical Analysis** - Appropriate methods for your research design
-- ✅ **Publication-Ready Reports** - Structured academic documents
-- ✅ **Claude Desktop Integration** - Natural conversation interface
-- ✅ **Amazon Q CLI Support** - Command-line automation
-- ✅ **Modular Architecture** - Use individual tools or complete workflow
-
-## 📋 Requirements
-
-- **Node.js** 18.0.0 or higher
-- **Claude Desktop** or **Amazon Q CLI** (for MCP integration)
-- **Python** (optional, for code execution)
-- **R** (optional, for R script execution)
-
-## 🔧 Development
-
-```bash
-# Clone and setup
-git clone https://github.com/yourusername/academic-research-mcp-suite.git
-cd academic-research-mcp-suite
-npm install
-
-# Build
-npm run build
-
-# Test
-npm test
-
-# Local development
-npm run setup
-```
-
-## 📖 Documentation
-
-- [API Documentation](./docs/API_CONTRACT_Version2.md)
-- [Usage Guide](./docs/USAGE.md)
-- [Complete Project Documentation](./docs/COMPLETE_PROJECT_SUCCESS.md)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our contributing guidelines and submit pull requests.
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🎉 Why Use This?
-
-**Before**: Manual research workflows taking weeks or months
-- ❌ Manual question refinement
-- ❌ Time-consuming data cleaning  
-- ❌ Writing analysis code from scratch
-- ❌ Manual report compilation
-
-**After**: Automated research pipeline in hours
-- ✅ AI-powered question development
-- ✅ Intelligent data processing
-- ✅ Automatic code generation
-- ✅ Publication-ready reports
-
-## 🚀 Get Started Now
-
-```bash
-npx academic-research-mcp-suite
-```
-
-Transform your research workflow today! 🔬✨
+Academic Research MCP Suite is a set of six specialized Model Context Protocol (MCP) servers that automate the full academic research pipeline — from refining a vague research question to generating a publication-ready report. Each server handles a distinct stage of the workflow: question development, data processing, code generation, script execution, and report writing, with an orchestrator that coordinates the entire sequence. The suite integrates with all major AI clients (Claude Desktop, Claude Code, Cursor, Gemini CLI, Kiro CLI, and Google's Antigravity IDE) and is designed to be installed once and used everywhere.
 
 ---
 
-*Academic Research MCP Suite - Revolutionizing research with AI automation*
+## The 6 Servers
+
+| Binary | Role |
+|---|---|
+| `academic-research-orchestrator` | Coordinates the full pipeline end-to-end |
+| `academic-research-initiator` | Refines research questions into testable hypotheses |
+| `academic-data-processor` | Cleans and prepares datasets |
+| `academic-code-generator` | Generates statistical analysis scripts (Python, R, JS) |
+| `academic-code-executor` | Runs analysis scripts and captures output |
+| `academic-research-writer` | Composes structured academic reports |
+
+---
+
+## Step 1 — Install
+
+```bash
+npm install -g academic-research-mcp-suite
+```
+
+Requires Node.js 18+.
+
+---
+
+## Step 2 — Verify the installation
+
+```bash
+academic-mcp-doctor
+```
+
+This checks that all 6 server binaries are on your PATH, completes the MCP handshake with each one, and confirms their tools are exposed. You should see `6/6 servers healthy`.
+
+---
+
+## Step 3 — Configure your AI clients
+
+```bash
+academic-mcp-configure
+```
+
+This generates the correct MCP config for every supported client automatically:
+
+| Client | Config file |
+|---|---|
+| Kiro CLI | `~/.kiro/settings/mcp.json` |
+| Claude Code | `~/.claude/settings.json` |
+| Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Cursor | `~/.cursor/mcp.json` |
+| Gemini CLI | `~/.gemini/settings.json` |
+| Antigravity (Google IDE) | `~/.gemini/antigravity/mcp_config.json` |
+
+The command merges safely — it will not overwrite other MCP servers you already have configured.
+
+**Restart Claude Desktop and Cursor** after running this command.
+
+---
+
+## Step 4 — Use it
+
+Once configured, talk to any supported AI client naturally:
+
+```
+"Use the research orchestrator to run a complete study on remote work
+ and employee productivity using my survey data at ./data/survey.csv"
+```
+
+Or use individual servers for specific tasks:
+
+```
+"Refine my research question: does social media usage affect academic performance?"
+"Process my dataset and prepare it for statistical analysis"
+"Generate Python code for a regression analysis"
+"Execute my analysis scripts and capture the results"
+"Write a research report from my analysis results"
+```
+
+---
+
+## Workflow
+
+```
+Research Idea
+    → Initiator   (refine question + hypotheses)
+    → Processor   (clean data)
+    → Generator   (write analysis code)
+    → Executor    (run scripts)
+    → Writer      (compose report)
+    → Publication-ready output
+```
+
+The Orchestrator can run this entire sequence in a single prompt.
+
+---
+
+## Manual client configuration
+
+If you prefer to configure clients manually instead of using `academic-mcp-configure`, add this block to your client's MCP config file:
+
+```json
+{
+  "mcpServers": {
+    "academic-research-orchestrator": { "command": "academic-research-orchestrator" },
+    "academic-research-initiator":    { "command": "academic-research-initiator" },
+    "academic-data-processor":        { "command": "academic-data-processor" },
+    "academic-code-generator":        { "command": "academic-code-generator" },
+    "academic-code-executor":         { "command": "academic-code-executor" },
+    "academic-research-writer":       { "command": "academic-research-writer" }
+  }
+}
+```
+
+---
+
+## Development
+
+```bash
+git clone https://github.com/sercantas/Academic-Research-MCP-Suite.git
+cd Academic-Research-MCP-Suite
+npm install
+npm run build
+npm test
+```
+
+---
+
+## Requirements
+
+- Node.js 18+
+- One or more supported AI clients (see Step 3)
+- Python or R (optional — only needed if you use the code executor with those languages)
+
+---
+
+## License
+
+MIT
