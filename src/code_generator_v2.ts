@@ -810,7 +810,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       GenerateOutputSchema.parse(output); // Validate output
 
       return {
-        content: [{ type: "json", json: output }],
+        content: [{ type: "text", text: JSON.stringify(output, null, 2) }],
       };
     } catch (error: any) {
       console.error("Error in 'generate' tool:", error);
@@ -818,14 +818,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "json",
-            json: {
+            type: "text",
+            text: JSON.stringify({
               status: "error",
               analysis_scripts: {},
               exploratory_findings: { description: "Error during script generation." },
               log: serverLogs.length > 0 ? serverLogs : [`Error processing 'generate' request for project_id: ${args?.project_id || 'unknown'}`],
               errors: errMessages,
-            },
+            }, null, 2),
           },
         ],
       };

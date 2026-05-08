@@ -277,8 +277,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "json", // MCP SDK expects content to be an array of objects with type and text/json
-            json: output,
+            type: "text",
+            text: JSON.stringify(output, null, 2),
           },
         ],
       };
@@ -288,8 +288,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [
           {
-            type: "json",
-            json: {
+            type: "text",
+            text: JSON.stringify({
               status: "error",
               refined_question: "",
               hypotheses: [],
@@ -297,7 +297,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               lit_review_notes: "",
               log: [`Error processing project_id: ${args?.project_id || 'unknown'}`],
               errors: errors,
-            },
+            }, null, 2),
           },
         ],
       };
