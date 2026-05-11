@@ -18,6 +18,8 @@ const ComposeInputSchema = z.object({
   lit_review_notes: z.string().optional(),
   methodology: z.string().optional(),
   data_description: z.string().optional(),
+  style: z.enum(["generic", "apa", "asa"]).optional().default("generic"),
+  references: z.array(z.string()).optional().default([]),
 });
 
 const ComposeOutputSchema = z.object({
@@ -43,17 +45,54 @@ const tools: Tool[] = [
         lit_review_notes: { type: "string", description: "Literature review notes" },
         methodology: { type: "string", description: "Research methodology description" },
         data_description: { type: "string", description: "Description of data used" },
+        style: { type: "string", enum: ["generic", "apa", "asa"], description: "Citation and section style", default: "generic" },
+        references: { type: "array", items: { type: "string" }, description: "Reference list entries" },
       },
       required: ["project_id", "refined_question", "hypotheses", "results"],
     },
   },
 ];
 
-// Helper functions for report generation
-function generateExecutiveSummary(question: string, hypotheses: string[], results: string): string {
-  return `## Executive Summary
+type Style = "generic" | "apa" | "asa";
 
-This research study investigated: "${question}"
+// Style-specific section heading labels
+const SECTION_LABELS: Record<Style, Record<string, string>> = {
+  generic: {
+    abstract:    "Abstract",
+    litReview:   "Literature Review",
+    methodology: "Methodology",
+    results:     "Results and Findings",
+    discussion:  "Discussion and Conclusions",
+    references:  "References",
+  },
+  apa: {
+    abstract:    "Abstract",
+    litReview:   "Literature Review",
+    methodology: "Method",
+    results:     "Results",
+    discussion:  "Discussion",
+    references:  "References",
+  },
+  asa: {
+    abstract:    "Abstract",
+    litReview:   "Theoretical Background and Prior Research",
+    methodology: "Data and Methods",
+    results:     "Findings",
+    discussion:  "Discussion and Conclusions",
+    references:  "References",
+  },
+};
+
+// Helper functions for report generation
+function generateExecutiveSummary(question: string, hypotheses: string[], results: string, style: Style): string {
+  const label = SECTION_LABELS[style].abstract;
+  const intro = style === "asa"
+    ? `This study examines: "${question}"`
+    : `This research study investigated: "${question}"`;
+
+  return `## ${label}
+
+${intro}
 
 **Key Hypotheses Tested:**
 ${hypotheses.map((h, i) => `${i + 1}. ${h}`).join('\n')}
@@ -64,8 +103,23 @@ ${results.substring(0, 500)}${results.length > 500 ? '...' : ''}
 The study provides valuable insights into the research question and offers evidence-based conclusions for further consideration.`;
 }
 
-function generateMethodologySection(methodology?: string, dataDescription?: string): string {
-  return `## Methodology
+function generateMethodologySection(style: Style, methodology?: string, dataDescription?: string): string {
+  const label = SECTION_LABELS[style].methodology;
+
+  if (style === "asa") {
+    return `## ${label}
+
+${methodology || `This study employs quantitative methods to examine the research question. The analytical strategy is designed to test the stated hypotheses using appropriate statistical techniques.`}
+
+### Data
+${dataDescription || `The dataset was processed and cleaned according to established best practices. Data quality checks were performed to ensure reliability.`}
+
+### Analytic Strategy
+Analyses include descriptive statistics, bivariate associations, and multivariate models appropriate to the data structure and research questions.`;
+  }
+
+  // APA and generic share the same structure
+  return `## ${label}
 
 ${methodology || `This study employed a quantitative research approach with statistical analysis of the collected data. The methodology was designed to test the stated hypotheses through appropriate analytical techniques.`}
 
@@ -76,8 +130,9 @@ ${dataDescription || `The dataset used in this analysis was processed and cleane
 Statistical analyses were conducted to test each hypothesis, including descriptive statistics, correlation analysis, and appropriate inferential tests based on the data characteristics and research questions.`;
 }
 
-function generateResultsSection(results: string, hypotheses: string[]): string {
-  return `## Results and Findings
+function generateResultsSection(results: string, hypotheses: string[], style: Style): string {
+  const label = SECTION_LABELS[style].results;
+  return `## ${label}
 
 ### Statistical Analysis Results
 ${results}
@@ -94,8 +149,19 @@ ${hypotheses.map((h, i) => `
 The analysis reveals important patterns and relationships in the data that contribute to our understanding of the research question. Detailed statistical outputs and visualizations support these findings.`;
 }
 
-function generateLiteratureReview(litReviewNotes?: string): string {
-  return `## Literature Review
+function generateLiteratureReview(style: Style, litReviewNotes?: string): string {
+  const label = SECTION_LABELS[style].litReview;
+
+  if (style === "asa") {
+    return `## ${label}
+
+${litReviewNotes || `Sociological research has examined related questions through multiple theoretical lenses. This study situates itself within that tradition while extending prior work through new empirical evidence.`}
+
+### Theoretical Framework
+The analysis draws on established sociological theory to interpret the relationships under investigation and situate findings within broader structural and cultural contexts.`;
+  }
+
+  return `## ${label}
 
 ${litReviewNotes || `The existing literature provides important context for this research. Previous studies have explored related questions and established theoretical frameworks that inform our approach. This study builds upon established research while contributing new insights to the field.`}
 
@@ -103,8 +169,9 @@ ${litReviewNotes || `The existing literature provides important context for this
 The research is grounded in established theoretical perspectives that guide the interpretation of findings and their implications for practice and future research.`;
 }
 
-function generateDiscussionAndConclusions(question: string, results: string): string {
-  return `## Discussion and Conclusions
+function generateDiscussionAndConclusions(question: string, results: string, style: Style): string {
+  const label = SECTION_LABELS[style].discussion;
+  return `## ${label}
 
 ### Interpretation of Findings
 The results of this study provide important insights into the research question: "${question}"
@@ -130,14 +197,37 @@ This study opens several avenues for future investigation:
 This research contributes valuable evidence to the field and provides a foundation for continued investigation of these important questions.`;
 }
 
-function generateReferences(): string {
-  return `## References
+function generateReferences(style: Style, references: string[]): string {
+  const label = SECTION_LABELS[style].references;
 
-*Note: In a complete research report, this section would include full citations of all sources referenced in the literature review and methodology sections. References should follow appropriate academic citation style (APA, MLA, etc.).*
+  if (references.length === 0) {
+    return `## ${label}
 
-1. [Literature sources would be listed here]
-2. [Methodology references would be included]
-3. [Statistical analysis references as appropriate]`;
+*No references were provided. Add a \`references\` array to the compose call to populate this section.*`;
+  }
+
+  const formatted = references.map((ref, i) => {
+    // Already formatted: has a year in parens or starts with "Lastname, F" pattern
+    if (/\(\d{4}\)|^\w+,\s+\w/.test(ref)) return `${i + 1}. ${ref}`;
+
+    // Attempt "Firstname Lastname" → "Lastname, Firstname" for bare name-like entries.
+    // Only applies when the entry looks like a name (2–3 words, no slashes or dots suggesting a path/URL).
+    const nameMatch = ref.match(/^([A-Z][a-z]+)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)$/);
+    if (nameMatch) return `${i + 1}. ${nameMatch[2]}, ${nameMatch[1]}.`;
+
+    // Bare filename / path / URL — present as-is
+    return `${i + 1}. ${ref}`;
+  });
+
+  const styleNote = style === "apa"
+    ? "\n*Format references in APA 7th edition style.*\n"
+    : style === "asa"
+    ? "\n*Format references in ASA 6th edition style.*\n"
+    : "";
+
+  return `## ${label}
+${styleNote}
+${formatted.join('\n')}`;
 }
 
 async function createReportFile(projectId: string, content: string): Promise<string> {
@@ -187,14 +277,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const executiveSummary = generateExecutiveSummary(
         validatedArgs.refined_question,
         validatedArgs.hypotheses,
-        validatedArgs.results
+        validatedArgs.results,
+        validatedArgs.style
       );
       
       serverLogs.push("Generating literature review...");
-      const literatureReview = generateLiteratureReview(validatedArgs.lit_review_notes);
+      const literatureReview = generateLiteratureReview(validatedArgs.style, validatedArgs.lit_review_notes);
       
       serverLogs.push("Generating methodology section...");
       const methodology = generateMethodologySection(
+        validatedArgs.style,
         validatedArgs.methodology,
         validatedArgs.data_description
       );
@@ -202,17 +294,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       serverLogs.push("Generating results section...");
       const resultsSection = generateResultsSection(
         validatedArgs.results,
-        validatedArgs.hypotheses
+        validatedArgs.hypotheses,
+        validatedArgs.style
       );
       
       serverLogs.push("Generating discussion and conclusions...");
       const discussion = generateDiscussionAndConclusions(
         validatedArgs.refined_question,
-        validatedArgs.results
+        validatedArgs.results,
+        validatedArgs.style
       );
       
       serverLogs.push("Generating references...");
-      const references = generateReferences();
+      const references = generateReferences(validatedArgs.style, validatedArgs.references);
       
       // Compile full report
       const fullReport = `# Research Report: ${validatedArgs.refined_question}

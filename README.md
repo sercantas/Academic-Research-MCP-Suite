@@ -16,7 +16,7 @@ Academic Research MCP Suite is a set of six specialized Model Context Protocol (
 | `academic-data-processor` | Cleans and prepares datasets |
 | `academic-code-generator` | Generates statistical analysis scripts (Python, R, JS) |
 | `academic-code-executor` | Runs analysis scripts and captures output |
-| `academic-research-writer` | Composes structured academic reports |
+| `academic-research-writer` | Composes structured academic reports (APA / ASA / generic) |
 
 ---
 
@@ -81,6 +81,8 @@ Or use individual servers for specific tasks:
 "Execute my analysis scripts and capture the results"
 "Write a research report from my analysis results"
 ```
+
+The writer server accepts an optional `style` parameter (`"generic"`, `"apa"`, or `"asa"`) and a `references` array. Pass `style: "asa"` for sociology papers (front-loaded theory sections, ASA heading labels) or `style: "apa"` for quantitative/psych conventions. Any references you supply are rendered as a numbered list; bare "Firstname Lastname" entries are automatically flipped to "Lastname, Firstname." format.
 
 ---
 
